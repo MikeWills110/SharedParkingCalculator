@@ -1,0 +1,18 @@
+﻿Land Use,CustomerWeekday,EmployeeWeekday,CustomerWeekend,EmployeeWeekend
+PAC – Audience,1.00,0.00,1.00,0.00
+PAC – Performers,0.00,1.00,0.00,1.00
+PAC – Employees,0.00,1.00,0.00,1.00
+Children’s Museum – Visitors,0.90,0.10,0.95,0.05
+Children’s Museum – Staff,0.00,1.00,0.00,1.00
+Children’s Museum – Storage,0.00,1.00,0.00,1.00
+OTP – Large Stage Audience,0.95,0.05,0.98,0.02
+OTP – Small Stage Audience,0.95,0.05,0.98,0.02
+OTP – Performers,0.00,1.00,0.00,1.00
+OTP – Orchestra,0.00,1.00,0.00,1.00
+OTP – Staff,0.00,1.00,0.00,1.00
+OTP – Storage,0.00,1.00,0.00,1.00
+History Museum – Exhibit,0.90,0.10,0.95,0.05
+History Museum – Storage,0.00,1.00,0.00,1.00
+History Museum – Offices,0.00,1.00,0.00,1.00
+Residences,1.00,0.00,1.00,0.00
+General Village Needs,1.00,0.00,1.00,0.00

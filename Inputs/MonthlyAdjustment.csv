@@ -1,0 +1,41 @@
+Land Use,January,February,March,April,May,June,July,August,September,October,November,December
+Children's Museum – StaffCustomer,0.8,0.85,0.95,1.05,1.15,1.25,1.3,1.25,1.1,0.95,0.85,0.85
+Children's Museum – StaffEmployee,0.8,0.85,0.95,1.05,1.15,1.25,1.3,1.25,1.1,0.95,0.85,0.85
+Children's Museum – StorageCustomer,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+Children's Museum – StorageEmployee,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+Children's Museum – VisitorsCustomer,0.8,0.85,0.95,1.05,1.15,1.25,1.3,1.25,1.1,0.95,0.85,0.85
+Children's Museum – VisitorsEmployee,0.8,0.85,0.95,1.05,1.15,1.25,1.3,1.25,1.1,0.95,0.85,0.85
+Children’s Museum – StaffCustomer,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+Children’s Museum – StaffEmployee,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+Children’s Museum – StorageCustomer,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+Children’s Museum – StorageEmployee,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+Children’s Museum – VisitorsCustomer,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+Children’s Museum – VisitorsEmployee,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+General Village NeedsCustomer,1.05,1.0,1.0,1.0,0.95,0.9,0.85,0.9,0.95,1.0,1.05,1.1
+General Village NeedsEmployee,1.05,1.0,1.0,1.0,0.95,0.9,0.85,0.9,0.95,1.0,1.05,1.1
+History Museum – ExhibitCustomer,0.95,0.95,1.0,1.05,1.1,1.15,1.2,1.15,1.05,1.0,0.95,0.95
+History Museum – ExhibitEmployee,0.95,0.95,1.0,1.05,1.1,1.15,1.2,1.15,1.05,1.0,0.95,0.95
+History Museum – OfficesCustomer,0.95,0.95,1.0,1.05,1.1,1.15,1.2,1.15,1.05,1.0,0.95,0.95
+History Museum – OfficesEmployee,0.95,0.95,1.0,1.05,1.1,1.15,1.2,1.15,1.05,1.0,0.95,0.95
+History Museum – StorageCustomer,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+History Museum – StorageEmployee,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+OTP – Large Stage AudienceCustomer,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+OTP – Large Stage AudienceEmployee,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+OTP – OrchestraCustomer,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+OTP – OrchestraEmployee,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+OTP – PerformersCustomer,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+OTP – PerformersEmployee,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+OTP – Small Stage AudienceCustomer,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+OTP – Small Stage AudienceEmployee,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+OTP – StaffCustomer,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+OTP – StaffEmployee,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+OTP – StorageCustomer,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+OTP – StorageEmployee,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+PAC – AudienceCustomer,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+PAC – AudienceEmployee,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+PAC – EmployeesCustomer,1.05,1.0,1.0,1.0,0.95,0.9,0.85,0.9,0.95,1.0,1.05,1.1
+PAC – EmployeesEmployee,1.05,1.0,1.0,1.0,0.95,0.9,0.85,0.9,0.95,1.0,1.05,1.1
+PAC – PerformersCustomer,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+PAC – PerformersEmployee,1.15,1.1,1.05,0.95,0.85,0.75,0.7,0.75,0.9,1.1,1.2,1.25
+ResidencesCustomer,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+ResidencesEmployee,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
