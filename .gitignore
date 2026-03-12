@@ -1,16 +1,20 @@
-﻿*.csv
-!Inputs/*.csv
+﻿# Ignore generated artifacts by default
 *.xlsx
 *.json
 *.tmp
 *.pdf
 *.pyc
-Scripts/__pycache__/LandUse.cpython-37.pyc
-__pycache__
-.vscode/
 
-# Generated outputs
-Outputs/
+# But keep CSV inputs under Inputs/
+*.csv
+!Inputs/*.csv
+
+# Python cache
+__pycache__/
+**/__pycache__/
+
+# Editor settings
+.vscode/
 
 # Generated outputs
 Outputs/
