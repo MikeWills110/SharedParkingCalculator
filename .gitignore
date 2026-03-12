@@ -16,4 +16,4 @@ Outputs/
 Outputs/
 
 # Excel temp files
-~.*
+~$*
