@@ -9,6 +9,8 @@ import os
 import sys
 from datetime import datetime
 
+import pandas as pd
+
 from LandUse import parking_demand
 from get_inputs import get_working_directory
 
@@ -102,6 +104,53 @@ def _print_inputs_snapshot(resolved_required_files):
     print("")
 
 
+def _build_inputs_snapshot_rows(resolved_required_files):
+    rows = []
+    for rel, full in resolved_required_files:
+        stat = os.stat(full)
+        rows.append(
+            {
+                "required_file": rel,
+                "resolved_path": os.path.abspath(full),
+                "modified_local": datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S"),
+                "size_bytes": stat.st_size,
+            }
+        )
+    return rows
+
+
+def _write_excel_with_metadata(df, out_path, resolved_required_files, *, mode, working_directory):
+    """
+    Write the main results plus a Metadata sheet containing run info and a full
+    inputs snapshot, so the workbook is self-describing.
+
+    df: pandas DataFrame
+    out_path: .xlsx file path to write
+    resolved_required_files: list of (relative_required_path, resolved_full_path)
+    mode: "Weekday" or "Weekend"
+    working_directory: base working directory used for the run
+    """
+    run_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    df_kv = pd.DataFrame(
+        [
+            {"key": "run_timestamp_local", "value": run_ts},
+            {"key": "working_directory", "value": os.path.abspath(working_directory)},
+            {"key": "mode", "value": mode},
+        ]
+    )
+
+    df_inputs = pd.DataFrame(_build_inputs_snapshot_rows(resolved_required_files))
+
+    with pd.ExcelWriter(out_path, engine="openpyxl") as writer:
+        # Main results
+        df.to_excel(writer, sheet_name="Results", index=True)
+
+        # Metadata (key/value + inputs table)
+        df_kv.to_excel(writer, sheet_name="Metadata", index=False, startrow=0)
+        df_inputs.to_excel(writer, sheet_name="Metadata", index=False, startrow=len(df_kv) + 2)
+
+
 # Get working directory from command line input
 in_arg = get_working_directory()
 working_directory = in_arg.dir
@@ -120,15 +169,27 @@ except FileNotFoundError as e:
 # Print snapshot so you can confirm which input set produced the outputs
 _print_inputs_snapshot(resolved_required_files)
 
-# Calculate weekday parking tables and export to Excel
+# Calculate weekday parking tables and export to Excel (with metadata)
 weekday_parking_demand = parking_demand("Weekday")
 weekday_filepath = os.path.join(outputs_dir, "WeekdayParking.xlsx")
-weekday_parking_demand.to_excel(weekday_filepath)
+_write_excel_with_metadata(
+    weekday_parking_demand,
+    weekday_filepath,
+    resolved_required_files,
+    mode="Weekday",
+    working_directory=working_directory,
+)
 
-# Calculate weekend parking tables and export to Excel
+# Calculate weekend parking tables and export to Excel (with metadata)
 weekend_parking_demand = parking_demand("Weekend")
 weekend_filepath = os.path.join(outputs_dir, "WeekendParking.xlsx")
-weekend_parking_demand.to_excel(weekend_filepath)
+_write_excel_with_metadata(
+    weekend_parking_demand,
+    weekend_filepath,
+    resolved_required_files,
+    mode="Weekend",
+    working_directory=working_directory,
+)
 
 print("Shared parking calculations complete.")
 print(f"Weekday output saved to: {os.path.abspath(weekday_filepath)}")
