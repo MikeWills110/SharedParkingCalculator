@@ -7,6 +7,7 @@
 
 import os
 import sys
+import subprocess
 from datetime import datetime
 
 import pandas as pd
@@ -119,6 +120,24 @@ def _build_inputs_snapshot_rows(resolved_required_files):
     return rows
 
 
+def _get_git_commit_hash(repo_dir):
+    """
+    Best-effort: return current git commit hash (short) for the repo at repo_dir.
+    Returns None if git isn't available or repo_dir isn't a git repo.
+    """
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            cwd=repo_dir,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        return result.stdout.strip()
+    except Exception:
+        return None
+
+
 def _write_excel_with_metadata(df, out_path, resolved_required_files, *, mode, working_directory):
     """
     Write the main results plus a Metadata sheet containing run info and a full
@@ -131,12 +150,14 @@ def _write_excel_with_metadata(df, out_path, resolved_required_files, *, mode, w
     working_directory: base working directory used for the run
     """
     run_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    git_hash = _get_git_commit_hash(working_directory)
 
     df_kv = pd.DataFrame(
         [
             {"key": "run_timestamp_local", "value": run_ts},
             {"key": "working_directory", "value": os.path.abspath(working_directory)},
             {"key": "mode", "value": mode},
+            {"key": "git_commit", "value": git_hash if git_hash else ""},
         ]
     )
 
