@@ -3,7 +3,47 @@
   <img src="https://github.com/joshuacayanan/SharedParkingCalculator/blob/master/Assets/car-parking.png" width="70" align="right"/> 
 </p>
 
+## Quick start
 
+```bash
+# from repo root
+python calculate_shared_parking.py --dir .
+```
+
+The script will:
+- validate required CSV files exist under `Inputs/`
+- print an "Inputs snapshot" (filename, modified timestamp, size)
+- write results to:
+  - `Outputs/WeekdayParking.xlsx`
+  - `Outputs/WeekendParking.xlsx`
+
+> Note: `Outputs/` is intentionally ignored by Git (generated artifacts).
+
+## Recommended workflow (when the project gets refined)
+
+1) Update one or more CSVs in `Inputs/` (see `Inputs/README.md` for what each file controls).
+2) Run the calculator:
+   ```bash
+   python calculate_shared_parking.py --dir .
+   ```
+3) Confirm outputs look correct (open the Excel files in `Outputs/`).
+4) Review your changes:
+   ```bash
+   git diff
+   ```
+5) Commit the updated inputs (and/or code) with a clear message:
+   ```bash
+   git add Inputs/*.csv
+   git commit -m "Update inputs for <scenario/date/assumption>"
+   git push origin master
+   ```
+For detailed model setup and background, see `Model_SETUP.md`.
+
+## Notes / conventions
+
+- **Inputs are source-of-truth**: CSVs in `Inputs/` are version-controlled so changes are traceable over time.
+- **Generated outputs are not version-controlled**: Excel files in `Outputs/` are reproducible artifacts.
+- If results differ unexpectedly, compare the "Inputs snapshot" printed by the script between runs to confirm the same input set was used.
 
 # Shared Parking Calculator
 This repository contains a calculator that forecasts shared parking demand for mixed-use sites. Parking demand for each land use is calculated on an hourly basis from 6:00 - 0:00 within a typical weekday or weekend day for each month of the year. The calculator also plots the following graphs:
