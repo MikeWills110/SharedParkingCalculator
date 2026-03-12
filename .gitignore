@@ -8,3 +8,6 @@
 Scripts/__pycache__/LandUse.cpython-37.pyc
 __pycache__
 .vscode/
+
+# Generated outputs
+Outputs/
