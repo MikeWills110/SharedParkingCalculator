@@ -1,0 +1,7 @@
+# Save this as .gitattributes in your project root
+* text=auto
+*.py text eol=lf
+*.csv text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.xlsx binary
