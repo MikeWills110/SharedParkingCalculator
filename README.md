@@ -64,15 +64,16 @@ This generates `uv.lock` — a pinned snapshot of every package and version. Com
 ### Running the Calculator
 
     # Make sure the venv is active, then from the project root:
-    python calculate_shared_parking.py
+    python calculate_shared_parking.py --dir .
+
 
 The script reads input files from the `Inputs/` folder, applies time-of-day adjustment factors, and writes results to the `Outputs/` folder.
 
 ### Input / Output Workflow
 
-1. **Place input files** in `Inputs/` — Excel workbooks defining land uses, parking rates, and time-of-day factors.
-2. **Run the script** — it processes all inputs and calculates shared parking demand.
-3. **Collect results** from `Outputs/` — generated Excel workbooks with detailed analysis.
+1. **Place input files** in `Inputs/` — CSV files defining land uses, parking rates, and time-of-day factors.
+2. **Run the script** — pass `--dir .` (current directory) or a full path to the project root.
+3. **Collect results** from `Outputs/` — `WeekdayParking.xlsx` and `WeekendParking.xlsx`.
 
 > **Note:** `Outputs/*.xlsx` files are git-ignored. Regenerate them locally by running the script.
 
