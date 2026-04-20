@@ -1,23 +1,64 @@
-﻿# Ignore generated artifacts by default
-*.xlsx
-*.json
-*.tmp
-*.pdf
-*.pyc
+﻿# ──────────────────────────────────────────────
+# SharedParkingCalculator  —  Python .gitignore
+# ──────────────────────────────────────────────
 
-# But keep CSV inputs under Inputs/
-*.csv
-!Inputs/*.csv
-
-# Python cache
+# ── Byte-compiled / optimised / DLL files ────
 __pycache__/
-**/__pycache__/
+*.py[cod]
+*$py.class
 
-# Editor settings
-.vscode/
+# ── Distribution / packaging ─────────────────
+build/
+dist/
+*.egg-info/
+*.egg
+*.whl
 
-# Generated outputs
-Outputs/
+# ── Virtual environments ─────────────────────
+# The project uses an external venv at C:\Envs\SharedParkingCalculator
+# but ignore any local venvs that might be created accidentally
+.venv/
+venv/
+env/
+ENV/
 
-# Excel temp files
-~$*
+# ── uv / pip artefacts ───────────────────────
+# Keep uv.lock in the repo for deterministic installs
+# but ignore caches
+.uv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ── IDE / editor ─────────────────────────────
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+*.swp
+*.swo
+*~
+
+# ── OS generated ─────────────────────────────
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+.DS_Store?
+._*
+
+# ── Testing / coverage ──────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
+# ── Jupyter Notebooks ───────────────────────
+.ipynb_checkpoints/
+
+# ── mypy / type-checking ────────────────────
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ── Output artefacts ────────────────────────
+# Ignore generated Excel files in Outputs/
+Outputs/*.xlsx
