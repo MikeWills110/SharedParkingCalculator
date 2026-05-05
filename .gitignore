@@ -1,64 +1,33 @@
-﻿# ──────────────────────────────────────────────
-# SharedParkingCalculator  —  Python .gitignore
-# ──────────────────────────────────────────────
+# Virtual environment
+.venv/
+venv/
+env/
 
-# ── Byte-compiled / optimised / DLL files ────
+# Output files (generated results)
+Outputs/
+
+# Python bytecode
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyo
 
-# ── Distribution / packaging ─────────────────
+# Distribution / packaging
 build/
 dist/
 *.egg-info/
 *.egg
-*.whl
 
-# ── Virtual environments ─────────────────────
-# The project uses an external venv at C:\Envs\SharedParkingCalculator
-# but ignore any local venvs that might be created accidentally
-.venv/
-venv/
-env/
-ENV/
-
-# ── uv / pip artefacts ───────────────────────
-# Keep uv.lock in the repo for deterministic installs
-# but ignore caches
-.uv/
-pip-log.txt
-pip-delete-this-directory.txt
-
-# ── IDE / editor ─────────────────────────────
-.vscode/*
-!.vscode/settings.json
-!.vscode/extensions.json
+# IDE / editor settings (keeping .vscode/ tracked for shared config)
+.idea/
 *.swp
 *.swo
 *~
 
-# ── OS generated ─────────────────────────────
+# OS files
 Thumbs.db
-ehthumbs.db
-Desktop.ini
 .DS_Store
-.DS_Store?
-._*
 
-# ── Testing / coverage ──────────────────────
-.pytest_cache/
-.coverage
-htmlcov/
-*.cover
-
-# ── Jupyter Notebooks ───────────────────────
-.ipynb_checkpoints/
-
-# ── mypy / type-checking ────────────────────
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# ── Output artefacts ────────────────────────
-# Ignore generated Excel files in Outputs/
-Outputs/*.xlsx
+# Environment variables
+.env
+.env.local
