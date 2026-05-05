@@ -1,33 +1,20 @@
+﻿# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
 # Virtual environment
 .venv/
-venv/
-env/
 
-# Output files (generated results)
+# IDE
+.vscode/
+
+# Generated outputs
 Outputs/
 
-# Python bytecode
-__pycache__/
-*.py[cod]
-*$py.class
-*.pyo
-
-# Distribution / packaging
-build/
-dist/
-*.egg-info/
-*.egg
-
-# IDE / editor settings (keeping .vscode/ tracked for shared config)
-.idea/
-*.swp
-*.swo
-*~
-
-# OS files
-Thumbs.db
+# OS
 .DS_Store
-
-# Environment variables
-.env
-.env.local
+Thumbs.db
