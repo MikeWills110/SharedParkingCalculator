@@ -1,136 +1,190 @@
 # PROGRAMMER: Joshua Cayanan
 # DATE CREATED: May 25, 2020
+# REVISED: May 2026 — removed module-level side effects, converted class to
+#          functions, added type hints, lazy-loaded inputs.
+
+from __future__ import annotations
 
 import numpy as np
 import pandas as pd
-import os
+
 from get_inputs import get_inputs
 
-# Save the original working directory before get_inputs changes it
-original_dir = os.getcwd()
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+TIMES: list[str] = [str(i) for i in range(24)]
+MONTHS: list[str] = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+]
+_COL_NAMES: list[str] = ["Land Use"] + TIMES + ["Month"]
 
-#Call the get_inputs function
-base_parking_demand, customer_employee_split, tod_weekday, tod_weekend, \
-noncaptive_weekday, noncaptive_weekend, monthly_factors = get_inputs()
+# ---------------------------------------------------------------------------
+# Lazy-loaded data cache (populated on first call to parking_demand)
+# ---------------------------------------------------------------------------
+_data_cache: dict | None = None
 
-# Return to the original working directory
-os.chdir(original_dir)
 
-#Create a Class for ULI land use categories
-class LandUse():
-    def __init__(self, name):
-        self.name = name
+def _load_data() -> dict:
+    """Load and cache all input DataFrames. Safe to call multiple times."""
+    global _data_cache
+    if _data_cache is not None:
+        return _data_cache
 
-    def compute_parking(self, context, base_parking_demand, customer_employee_split, tod, noncaptive, monthly):
-        #Concatenate user type suffixes to land use name for subsequent dataframe match row to string search
-        customer_row_namer = self.name + 'Customer'
-        employee_row_namer = self.name + 'Employee'
+    (
+        base_parking_demand,
+        customer_employee_split,
+        tod_weekday,
+        tod_weekend,
+        noncaptive_weekday,
+        noncaptive_weekend,
+        monthly_factors,
+    ) = get_inputs()
 
-        #Extract appropriate rows based on land use name from common dataframes
-        df_1 = base_parking_demand
-        daily_demand = df_1.loc[self.name, context]
+    _data_cache = {
+        "base_parking_demand": base_parking_demand,
+        "customer_employee_split": customer_employee_split,
+        "tod_weekday": tod_weekday,
+        "tod_weekend": tod_weekend,
+        "noncaptive_weekday": noncaptive_weekday,
+        "noncaptive_weekend": noncaptive_weekend,
+        "monthly_factors": monthly_factors,
+    }
+    return _data_cache
 
-        df_2 = customer_employee_split
-        customer_split = df_2.loc[self.name, 'Customer' + context]
-        employee_split = df_2.loc[self.name, 'Employee' + context]
 
-        df_3 = tod
-        customer_tod = df_3.loc[customer_row_namer, :]
-        employee_tod = df_3.loc[employee_row_namer, :]
+# ---------------------------------------------------------------------------
+# Core calculation functions
+# ---------------------------------------------------------------------------
+def _compute_parking(
+    name: str,
+    context: str,
+    base_parking_demand: pd.DataFrame,
+    customer_employee_split: pd.DataFrame,
+    tod: pd.DataFrame,
+    noncaptive: pd.DataFrame,
+    monthly: pd.DataFrame,
+) -> list[list]:
+    """
+    Calculate hourly parking demand for a single land use across all 12 months.
 
-        df_4 = noncaptive
-        customer_noncaptive = df_4.loc[customer_row_namer, :]
-        employee_noncaptive = df_4.loc[employee_row_namer, :]
+    Returns a list of 12 rows, each containing 24 hourly demand values plus the
+    month name.
+    """
+    customer_key = name + "Customer"
+    employee_key = name + "Employee"
 
-        df_5 = monthly
-        # Extract individual monthly factors for this land use's customer and employee components
-        customer_monthly = df_5.loc[customer_row_namer, :]
-        employee_monthly = df_5.loc[employee_row_namer, :]
+    # Base daily demand
+    daily_demand = base_parking_demand.loc[name, context]
 
-        #Calculate the parking demand, adjusted for customer/staff split, time of day profiles, noncaptive, and monthly effects
-        parking_demand_yearly = []
-        for month in months:
-            parking_demand_customer = daily_demand * customer_split * customer_tod * customer_noncaptive * customer_monthly[month]
-            parking_demand_employee = daily_demand * employee_split * employee_tod * employee_noncaptive * employee_monthly[month]
-            total_demand = parking_demand_customer + parking_demand_employee
+    # Customer / employee split ratios
+    customer_split = customer_employee_split.loc[name, "Customer" + context]
+    employee_split = customer_employee_split.loc[name, "Employee" + context]
 
-            # Replace any NaN values with 0 before converting to int
-            total_demand = total_demand.fillna(0)
-            # Convert to list, rounding each value
-            parking_demand_total = [int(np.rint(x)) for x in total_demand.values]
-            parking_demand_total.append(month)
+    # Time-of-day profiles
+    customer_tod = tod.loc[customer_key, :]
+    employee_tod = tod.loc[employee_key, :]
 
-            parking_demand_yearly.append(parking_demand_total)
+    # Non-captive adjustment factors
+    customer_noncaptive = noncaptive.loc[customer_key, :]
+    employee_noncaptive = noncaptive.loc[employee_key, :]
 
-        return parking_demand_yearly
+    # Monthly adjustment factors
+    customer_monthly = monthly.loc[customer_key, :]
+    employee_monthly = monthly.loc[employee_key, :]
 
-    def reshape_data(data_dictionary):
+    # Build hourly demand for each month
+    parking_demand_yearly: list[list] = []
+    for month in MONTHS:
+        customer_demand = (
+            daily_demand * customer_split * customer_tod
+            * customer_noncaptive * customer_monthly[month]
+        )
+        employee_demand = (
+            daily_demand * employee_split * employee_tod
+            * employee_noncaptive * employee_monthly[month]
+        )
+        total_demand = customer_demand + employee_demand
+        total_demand = total_demand.fillna(0)
 
-        data_list = []
-        for i in range(0, 12):
-            for key, value in data_dictionary.items():
-                row = [key] + value[i]
-                data_list.append(row)
+        hourly_values = np.rint(total_demand.values).astype(int).tolist()
+        hourly_values.append(month)
+        parking_demand_yearly.append(hourly_values)
 
-        #Convert to pandas df and apply transformations to reshape the data
-        df = pd.DataFrame(data_list, columns = col_names)
-        df = df.melt(['Land Use', 'Month'], value_vars = times, var_name = 'Time', value_name = 'Parking')
-        df['Month'] = pd.Categorical(df['Month'], categories = months, ordered = True)
-        df['Time'] = pd.Categorical(df['Time'], categories = times, ordered = True)
-        df.sort_values(by = ['Month', 'Time'], inplace = True)
-        df.reset_index(drop = True, inplace = True)
+    return parking_demand_yearly
 
-        df = df.pivot_table(values = 'Parking', index = ['Month', 'Time'], columns = ['Land Use'], \
-                            fill_value = 0, aggfunc = 'first')
 
-        #Create a new total column
-        df['Total'] =df.sum(axis = 1)
+def _reshape_data(data_dictionary: dict[str, list[list]]) -> pd.DataFrame:
+    """
+    Reshape the per-land-use yearly demand lists into a single pivot table
+    indexed by (Month, Time) with one column per land use plus a Total column.
+    """
+    data_list: list[list] = []
+    for i in range(12):
+        for key, value in data_dictionary.items():
+            row = [key] + value[i]
+            data_list.append(row)
 
-        return df
+    df = pd.DataFrame(data_list, columns=_COL_NAMES)
+    df = df.melt(
+        ["Land Use", "Month"],
+        value_vars=TIMES,
+        var_name="Time",
+        value_name="Parking",
+    )
+    df["Month"] = pd.Categorical(df["Month"], categories=MONTHS, ordered=True)
+    df["Time"] = pd.Categorical(df["Time"], categories=TIMES, ordered=True)
+    df.sort_values(by=["Month", "Time"], inplace=True)
+    df.reset_index(drop=True, inplace=True)
 
-#Dataframe columns in list format - using 24-hour format (0-23)
-times = [str(i) for i in range(24)]
-col_names = ['Land Use'] + times + ['Month']
-months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    df = df.pivot_table(
+        values="Parking",
+        index=["Month", "Time"],
+        columns=["Land Use"],
+        fill_value=0,
+        aggfunc="first",
+    )
 
-#Initialise land use objects
-areas = base_parking_demand.index
-land_uses = {name: LandUse(name) for name in areas}
+    df["Total"] = df.sum(axis=1)
+    return df
 
-#Create function for weekday and weekend parking demand
-def parking_demand(context):
-    if context == 'Weekday':
-        tod, noncaptive = tod_weekday, noncaptive_weekday
+
+# ---------------------------------------------------------------------------
+# Public API (signature unchanged — drop-in replacement)
+# ---------------------------------------------------------------------------
+def parking_demand(context: str) -> pd.DataFrame:
+    """
+    Calculate shared parking demand for all land uses.
+
+    Parameters
+    ----------
+    context : str
+        Either ``"Weekday"`` or ``"Weekend"``.
+
+    Returns
+    -------
+    pd.DataFrame
+        Pivot table indexed by (Month, Time) with columns per land use
+        and a Total column.
+    """
+    data = _load_data()
+
+    if context == "Weekday":
+        tod = data["tod_weekday"]
+        noncaptive = data["noncaptive_weekday"]
     else:
-        tod, noncaptive = tod_weekend, noncaptive_weekend
-    parking_demand_dict = {}
-    for land_use in land_uses.values():
-        parking_demand_dict[land_use.name] = land_use.compute_parking(context, base_parking_demand, customer_employee_split, \
-                                        tod, noncaptive, monthly_factors)
-    return LandUse.reshape_data(parking_demand_dict)
+        tod = data["tod_weekend"]
+        noncaptive = data["noncaptive_weekend"]
 
-# Main execution - compute parking demand for weekday and weekend
-if __name__ == '__main__':
-    
-    # Create Outputs directory if it doesn't exist
-    output_dir = os.path.join(original_dir, 'Outputs')
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    
-    # Compute parking demand for weekday and weekend
-    print("Computing weekday parking demand...")
-    weekday_df = parking_demand('Weekday')
-    
-    print("Computing weekend parking demand...")
-    weekend_df = parking_demand('Weekend')
-    
-    # Save to CSV files
-    weekday_path = os.path.join(output_dir, 'ParkingDemand_Weekday.csv')
-    weekend_path = os.path.join(output_dir, 'ParkingDemand_Weekend.csv')
-    
-    weekday_df.to_csv(weekday_path)
-    weekend_df.to_csv(weekend_path)
-    
-    print(f"Weekday parking demand saved to {weekday_path}")
-    print(f"Weekend parking demand saved to {weekend_path}")
-    print("Done!")
+    base = data["base_parking_demand"]
+    split = data["customer_employee_split"]
+    monthly = data["monthly_factors"]
+
+    parking_demand_dict: dict[str, list[list]] = {}
+    for name in base.index:
+        parking_demand_dict[name] = _compute_parking(
+            name, context, base, split, tod, noncaptive, monthly,
+        )
+
+    return _reshape_data(parking_demand_dict)
