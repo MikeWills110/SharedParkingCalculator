@@ -1,31 +1,42 @@
-# Shared Parking Calculator
+Shared Parking Calculator
+A deterministic Python tool for modeling hourly shared‑parking demand for mixed‑use developments using the ULI Shared Parking methodology. The calculator integrates land‑use program data, customer/employee behavior, time‑of‑day profiles, seasonal adjustments, and non‑captive factors to produce realistic hourly parking demand for both weekdays and weekends.
 
-A Python tool that estimates hourly parking demand for mixed-use developments using the **ULI (Urban Land Institute) Shared Parking** methodology. It accounts for customer/employee splits, time-of-day profiles, non-captive adjustments, and monthly seasonal variation to produce realistic hourly demand estimates across all 12 months.
+1. Purpose
+Traditional parking studies sum the peak demand of each land use independently, which overstates actual need.
+The ULI Shared Parking model recognizes that:
 
-## How It Works
+Land uses peak at different times
 
-The ULI shared parking model recognises that different land uses (retail, office, restaurant, etc.) peak at different times of day and year. By analysing each land use separately and summing the results, the calculator determines the **actual peak parking needed** — which is typically lower than the sum of individual peaks.
+Customer and employee patterns differ
 
-For each land use, the hourly parking demand is calculated as:
+Seasonal variation matters
 
-```
-Demand(hour) = Base Demand
-             × Customer/Employee Split
-             × Time-of-Day Factor(hour)
-             × Non-Captive Adjustment(hour)
-             × Monthly Factor(month)
-```
+Not all demand is captive to the site
 
-Customer and employee components are computed separately and summed, since they follow different arrival/departure patterns.
+This tool automates the full ULI workflow and outputs hour‑by‑hour demand for all 12 months, enabling right‑sized parking design.
 
-## Project Structure
+2. How the Model Works
+For each land use and each hour, demand is calculated as:
 
-```
+Code
+Hourly Demand =
+    Base Demand
+  × Customer/Employee Split
+  × Time‑of‑Day Factor (hour)
+  × Non‑Captive Adjustment (hour)
+  × Monthly Adjustment (month)
+Customer and employee components are computed separately and then summed.
+All land uses are aggregated to produce the total shared‑parking demand.
+
+3. Repository Layout
+Code
 SharedParkingCalculator/
-├── calculate_shared_parking.py   # Main entry point
-├── LandUse.py                    # Core parking demand calculations
-├── get_inputs.py                 # CSV loading and argument parsing
-├── Inputs/                       # Input CSV files (see below)
+│
+├── calculate_shared_parking.py     # Main execution script
+├── LandUse.py                      # Core demand calculations
+├── get_inputs.py                   # Input loading and validation
+│
+├── Inputs/                         # All required CSV inputs
 │   ├── BaseParkingDemand.csv
 │   ├── CustomerEmployeeSplit.csv
 │   ├── LandUseProgram.csv
@@ -34,91 +45,122 @@ SharedParkingCalculator/
 │   ├── NoncaptiveAdjustmentWeekend.csv
 │   ├── TimeOfDayWeekday.csv
 │   └── TimeOfDayWeekend.csv
-├── Outputs/                      # Generated Excel workbooks
+│
+├── Outputs/                        # Auto‑generated Excel results
 │   ├── WeekdayParking.xlsx
 │   └── WeekendParking.xlsx
+│
 └── requirements.txt
-```
+4. Environment Setup (Python 3.14 recommended)
+Create and activate a virtual environment
+powershell
+python -m venv .venv
+.\.venv\Scripts\activate
+Install dependencies
+powershell
+pip install -r requirements.txt
+If rebuilding manually:
 
-## Setup
+powershell
+pip install numpy pandas openpyxl matplotlib
+5. Running the Calculator
+From the project root:
 
-**Prerequisites:** Python 3.10+
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/<your-username>/SharedParkingCalculator.git
-   cd SharedParkingCalculator
-   ```
-
-2. Create and activate a virtual environment:
-
-   ```bash
-   python -m venv .venv
-
-   # Windows (PowerShell)
-   .\.venv\Scripts\Activate.ps1
-
-   # macOS / Linux
-   source .venv/bin/activate
-   ```
-
-3. Install dependencies:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Usage
-
-Run the calculator from the project root:
-
-```bash
+powershell
 python calculate_shared_parking.py --dir .
-```
+The --dir argument tells the script where to find the Inputs/ folder.
+Using . is correct when running from the repository root.
 
-The `--dir` argument specifies the project folder containing the `Inputs/` directory. Use `.` when running from the project root.
+Outputs
+Two Excel workbooks are generated in Outputs/:
 
-**Output:** Two Excel workbooks are saved to the `Outputs/` folder:
+File	Description
+WeekdayParking.xlsx	Hour‑by‑hour shared parking demand for a typical weekday (all 12 months)
+WeekendParking.xlsx	Hour‑by‑hour shared parking demand for a typical weekend day (all 12 months)
 
-| File | Contents |
-|------|----------|
-| `WeekdayParking.xlsx` | Hourly parking demand for a typical weekday, all 12 months |
-| `WeekendParking.xlsx` | Hourly parking demand for a typical weekend day, all 12 months |
 
-Each workbook contains a pivot table indexed by **(Month, Hour)** with one column per land use and a **Total** column showing the combined demand.
+Each workbook includes:
 
-## Input Files
+Input snapshot (file names, timestamps, sizes)
 
-All inputs are CSV files stored in the `Inputs/` folder. The first column of each CSV is used as the row index.
+Metadata block (run time, working directory, environment info)
 
-| File | Description |
-|------|-------------|
-| `BaseParkingDemand.csv` | Base daily parking demand per land use, with columns for Weekday and Weekend |
-| `CustomerEmployeeSplit.csv` | Proportion of demand from customers vs. employees for each land use |
-| `LandUseProgram.csv` | Land use program details for the development |
-| `TimeOfDayWeekday.csv` | Hourly demand profiles (0–23) for customers and employees on weekdays |
-| `TimeOfDayWeekend.csv` | Hourly demand profiles (0–23) for customers and employees on weekends |
-| `NoncaptiveAdjustmentWeekday.csv` | Non-captive reduction factors by hour for weekdays |
-| `NoncaptiveAdjustmentWeekend.csv` | Non-captive reduction factors by hour for weekends |
-| `MonthlyAdjustment.csv` | Seasonal adjustment factors (January–December) per land use |
+Hourly demand table with one column per land use and a Total column
 
-### Customising Inputs
+6. Input File Specifications
+All inputs must be placed in the Inputs/ folder.
+The first column of each CSV is treated as the index.
 
-To model a different development, edit the CSV files in the `Inputs/` folder:
+Required Input Files
+File	Purpose
+BaseParkingDemand.csv	Base daily parking demand per land use (weekday + weekend columns)
+CustomerEmployeeSplit.csv	Fraction of demand from customers vs. employees
+LandUseProgram.csv	Land‑use quantities for the development
+TimeOfDayWeekday.csv	Hourly customer/employee factors for weekdays
+TimeOfDayWeekend.csv	Hourly customer/employee factors for weekends
+NoncaptiveAdjustmentWeekday.csv	Hourly non‑captive factors for weekdays
+NoncaptiveAdjustmentWeekend.csv	Hourly non‑captive factors for weekends
+MonthlyAdjustment.csv	Seasonal multipliers for each land use (Jan–Dec)
 
-1. **Add or remove land uses** — Add/remove rows in `BaseParkingDemand.csv` and corresponding rows in all other CSVs. Time-of-day and non-captive CSVs require two rows per land use (one suffixed `Customer`, one suffixed `Employee`).
-2. **Adjust demand levels** — Change the base demand values in `BaseParkingDemand.csv`.
-3. **Modify seasonal patterns** — Edit `MonthlyAdjustment.csv` to reflect local seasonal variation.
 
-> **Note:** Land use names must match exactly across all CSV files, including capitalisation and apostrophes. The tool normalises common unicode apostrophe variants automatically.
+Naming Rules
+Land‑use names must match exactly across all CSVs.
 
-## Credits
+Time‑of‑day and non‑captive files require two rows per land use:
 
-- **Programmer:** Joshua Cayanan
-- **Date Created:** May 25, 2020
-- **Methodology:** Based on the ULI Shared Parking model
+<LandUse> Customer
 
-## License
+<LandUse> Employee
 
-This project is not currently licensed. Contact the author before reuse or distribution.
+Unicode apostrophes are normalized automatically.
+
+7. Customizing the Model
+To model a different development:
+
+Modify land‑use quantities  
+Edit LandUseProgram.csv.
+
+Add or remove land uses  
+Update all CSVs to include matching rows.
+
+Adjust demand patterns
+
+Change base demand
+
+Edit customer/employee splits
+
+Modify time‑of‑day curves
+
+Update seasonal factors
+
+Tune non‑captive behavior  
+Adjust hourly reduction factors for weekday/weekend.
+
+8. Reproducibility
+This project is designed for deterministic execution:
+
+All inputs are version‑controlled
+
+Outputs are timestamped
+
+The environment is isolated via .venv
+
+No external APIs or nondeterministic sources
+
+To rebuild the environment:
+
+powershell
+Remove-Item -Recurse -Force .venv
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+9. Credits
+Original Programmer: Joshua Cayanan
+
+Created: May 25, 2020
+
+Methodology: ULI Shared Parking Model
+
+10. License
+This project is not currently licensed.
+Contact the author before reuse or distribution.
